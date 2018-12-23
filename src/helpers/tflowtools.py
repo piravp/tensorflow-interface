@@ -196,7 +196,7 @@ def gen_all_one_hot_cases(len, floats=False):
 
 # This creates autoencoder cases for vector's with any density of 1's (specified by density_range).
 def gen_dense_autoencoder_cases(count,size,dr=(0,1)):
-    return [[v,v] for v in gen_random_density_vectors(count,size,density_range=dr)]
+    return [(v,v) for v in gen_random_density_vectors(count,size,density_range=dr)]
 
 # Produce a list of pairs, with each pair consisting of a num_bits bit pattern and a singleton list containing
 # the parity bit: 0 => an even number of 1's, 1 => odd number of 1's.  When double=True, a 2-bit vector is the

@@ -6,7 +6,6 @@ import src.functions.data as data
 # a machine-learning system
 
 
-
 class Caseman():
 
     def __init__(self, cfunc, case_fraction=1.0, vfrac=0.0, tfrac=0.2):
@@ -20,9 +19,14 @@ class Caseman():
         self.generate_cases()
         self.organize_cases()
 
+    def get_training_cases(self): return self.training_cases
+    def get_validation_cases(self): return self.validation_cases
+    def get_testing_cases(self): return self.testing_cases
+
+
     def generate_cases(self):
         # Run case generator
-        self.cases = self.casefunc()                                # case = (input-vector, target-vector)
+        self.cases, self.n_features, self.n_classes = self.casefunc()                                # case = (input-vector, target-vector)
 
     def organize_cases(self):
         # cases = np.array(self.cases)
@@ -49,18 +53,14 @@ class Caseman():
         minibatch = self.training_cases[:size]
         return minibatch
 
-    def get_training_cases(self): return self.training_cases
-    def get_validation_cases(self): return self.validation_cases
-    def get_testing_cases(self): return self.testing_cases
+
 
 
 cm_mnist = Caseman(cfunc=data.mnist, case_fraction=1.0, vfrac=0.0, tfrac=0.2)
 cm_auto = Caseman(cfunc=data.autoencoder, case_fraction=1.0, vfrac=0.0, tfrac=0.2)
 
-for case in cm_mnist.get_training_cases():
-    x, y = case
-
-n_training = len(cm_mnist.training_cases)
-print(n_training)
-# mb = cm_mnist.get_minibatch(10)
-# print(len(mb))
+fs = cm_mnist.n_features
+fa = cm_auto.n_classes
+print(fs, fa)
+# classes = cm_mnist.find_n_classes()
+# print(classes)
