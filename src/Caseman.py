@@ -56,11 +56,11 @@ class Caseman():
 
 
 
-cm_mnist = Caseman(cfunc=data.mnist, case_fraction=1.0, vfrac=0.0, tfrac=0.2)
-cm_auto = Caseman(cfunc=data.autoencoder, case_fraction=1.0, vfrac=0.0, tfrac=0.2)
-
-fs = cm_mnist.n_features
-fa = cm_auto.n_classes
-print(fs, fa)
+# cm_mnist = Caseman(cfunc=data.mnist, case_fraction=1.0, vfrac=0.0, tfrac=0.2)
+# cm_auto = Caseman(cfunc=data.autoencoder, case_fraction=1.0, vfrac=0.0, tfrac=0.2)
+#
+# fs = cm_mnist.n_features
+# fa = cm_auto.n_classes
+# print(fs, fa)
 # classes = cm_mnist.find_n_classes()
 # print(classes)
