@@ -477,3 +477,7 @@ def show_image(image_arr):
     pixels = first_image.reshape((28, 28))
     plt.imshow(pixels, cmap='gray')
     plt.show()
+
+
+def one_hot_vectors_to_ints(one_hot_vectors):
+    return [one_hot_to_int(one_hot_vector) for one_hot_vector in one_hot_vectors]

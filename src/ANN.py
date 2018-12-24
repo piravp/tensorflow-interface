@@ -1,8 +1,11 @@
 import tensorflow as tf
 import numpy as np
 import src.helpers.tflowtools as TFT
-import src.Layer
 from src.Layer import GANNModule
+import os
+
+# Turn off TF warnings about AVX etc.
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 class ANN:
     def __init__(self, cman, dimensions, hidden_activation, output_activation, cost_func,
@@ -21,7 +24,6 @@ class ANN:
         self.learning_rate = lrate
         self.initial_weight_range = initial_weight_range
         self.optimizer = optimizer
-
         self.minibatch_size = mb_size
         self.map_batch_size = map_batch_size
         self.validation_interval = val_interval
@@ -32,7 +34,6 @@ class ANN:
         self.display_biases = display_biases
 
         self.layers = []
-        # self.build()
 
     # Build graph
     def build(self):
@@ -67,7 +68,7 @@ class ANN:
         self.trainer = optimizer.minimize(self.error)   #Backpropagation
 
     def compute_accuracy(self, cases):
-        inputs, targets = cases
+        inputs, targets = np.asarray(cases).T
         # Caseman.show_image(inputs[0], targets[0])
         feeder = {self.input: inputs.tolist(), self.target: targets.tolist()}
         predictions, error = self.session.run([self.output, self.error], feeder)
@@ -75,11 +76,11 @@ class ANN:
         # # Test if output node with highest activation level correspond to target value
         # target_type = self.casemanager.casefunc.__name__
         # if target_type == 'one_hot' or target_type == 'ninja':
-        #     top_k = self.session.run(tf.nn.in_top_k(predictions, TFT.one_hot_vectors_to_ints(one_hot_vectors=targets), 1))
+        top_k = self.session.run(tf.nn.in_top_k(predictions, TFT.one_hot_vectors_to_ints(one_hot_vectors=targets), 1))
         # elif target_type == 'autoencoder':
-        #     top_k = self.session.run(tf.nn.in_top_k(predictions, TFT.bitdataset_to_intlist(matrix=targets), 1))
+        # top_k = self.session.run(tf.nn.in_top_k(predictions, TFT.bitdataset_to_intlist(matrix=targets), 1))
         # else:
-        top_k = self.session.run(tf.nn.in_top_k(predictions, targets, 1))
+        # top_k = self.session.run(tf.nn.in_top_k(predictions, targets, 1))
         return 100.0*np.sum(top_k)/len(inputs), error
 
     def validation_testing(self, step):
@@ -100,6 +101,7 @@ class ANN:
         # Training
         for step in range(1, self.steps + 1):
             inputs, targets = self.caseman.get_minibatch(self.minibatch_size)
+            # targets = targets.T
             feeder = {self.input: inputs.tolist(), self.target: targets.tolist()}
             _, error = self.session.run([self.trainer, self.error], feed_dict=feeder)
             self.training_step.append(step)
@@ -109,7 +111,7 @@ class ANN:
             self.validation_testing(step=step)
 
 
-    # Used to add layer(GANNModule) in Layer.py's build()
+    # Add layer(GANNModule) in Layer.py's build()
     def add_layer(self, layer):
         self.layers.append(layer)
 

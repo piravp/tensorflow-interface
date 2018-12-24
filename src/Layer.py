@@ -15,9 +15,7 @@ class GANNModule():
         self.build()
 
     def build(self):
-        # mona = self.name
-        n = self.size
-        self.weights = tf.Variable(np.random.uniform(self.weight_range[0], self.weight_range[1], size=(self.insize,n)), name=self.name+'-weights',trainable=True)   # True = default for trainable anyway
-        self.biases = tf.Variable(np.random.uniform(self.weight_range[0], self.weight_range[1], size=n), name=self.name+'-biases', trainable=True)                  # First bias vector
+        self.weights = tf.Variable(np.random.uniform(self.weight_range[0], self.weight_range[1], size=(self.insize,self.size)), name=self.name+'-weights',trainable=True)   # True = default for trainable anyway
+        self.biases = tf.Variable(np.random.uniform(self.weight_range[0], self.weight_range[1], size=self.size), name=self.name+'-biases', trainable=True)                  # First bias vector
         self.output =  self.activation_function(tf.matmul(self.input,self.weights)+self.biases,name=self.name)           # tf.nn.relu()
         self.ann.add_layer(self)

@@ -51,6 +51,7 @@ class Caseman():
     def get_minibatch(self, size):
         np.random.shuffle(self.training_cases)
         minibatch = self.training_cases[:size]
+        minibatch = np.asarray(minibatch).T                     # Transpose to get inputs and targets as tuples
         return minibatch
 
 
