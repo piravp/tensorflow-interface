@@ -3,6 +3,7 @@ import numpy as np
 import src.helpers.tflowtools as TFT
 from src.Layer import GANNModule
 import os
+from src.helpers.Visualizer import Visualizer
 
 # Turn off TF warnings about AVX etc.
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
@@ -12,7 +13,7 @@ class ANN:
                  lrate, initial_weight_range, optimizer, mb_size,
                  map_batch_size, steps, val_interval, map_layers, map_dendro, display_weights, display_biases):
 
-
+        print("\n~~~~~~~~~~~~~~~~~~~~~~ Initialization ~~~~~~~~~~~~~~~~~~~~~")
         print('Initializing neural network...')
         self.caseman = cman
         dimensions.insert(0, cman.n_features)
@@ -37,6 +38,8 @@ class ANN:
 
     # Build graph
     def build(self):
+        print('Building network...')
+
         # This is essential for doing multiple runs!!
         tf.reset_default_graph()
 
@@ -68,36 +71,35 @@ class ANN:
         self.trainer = optimizer.minimize(self.error)   #Backpropagation
 
     def compute_accuracy(self, cases):
+        # Split dataset
         inputs, targets = np.asarray(cases).T
-        # Caseman.show_image(inputs[0], targets[0])
         feeder = {self.input: inputs.tolist(), self.target: targets.tolist()}
         predictions, error = self.session.run([self.output, self.error], feeder)
 
-        # # Test if output node with highest activation level correspond to target value
-        # target_type = self.casemanager.casefunc.__name__
-        # if target_type == 'one_hot' or target_type == 'ninja':
+        # Output node with highest activation level correspond to target value
         top_k = self.session.run(tf.nn.in_top_k(predictions, TFT.one_hot_vectors_to_ints(one_hot_vectors=targets), 1))
-        # elif target_type == 'autoencoder':
-        # top_k = self.session.run(tf.nn.in_top_k(predictions, TFT.bitdataset_to_intlist(matrix=targets), 1))
-        # else:
-        # top_k = self.session.run(tf.nn.in_top_k(predictions, targets, 1))
+
         return 100.0*np.sum(top_k)/len(inputs), error
 
     def validation_testing(self, step):
-        if step % self.validation_interval == 0:
-            validation_cases = self.caseman.get_validation_cases()
-            accuracy, error = self.compute_accuracy(validation_cases)
-            self.validation_step.append(step)
-            self.validation_error.append(error)
-            print("Accuracy on validation set after {0}th minibatch: {1:.3f} %".format(step, accuracy))
+        validation_cases = self.caseman.get_validation_cases()
+        accuracy, error = self.compute_accuracy(validation_cases)
+        self.validation_step.append(step)
+        self.validation_error.append(error)
+        val_i = int(step/self.validation_interval)
+        val_steps = int(self.steps / self.validation_interval)
+        print("Accuracy on validation set [{0}/{1}]: {2:.3f} %".format(val_i, val_steps, accuracy))
 
     def train(self):
+        print('Initializing training...')
+
         self.session = tf.Session()
         self.session.run(tf.global_variables_initializer())
 
         self.training_step, self.training_error = [], []
         self.validation_step, self.validation_error = [], []
 
+        print("\n~~~~~~~~~~~~~~~~~~~~~~~~~ Training ~~~~~~~~~~~~~~~~~~~~~~~~")
         # Training
         for step in range(1, self.steps + 1):
             inputs, targets = self.caseman.get_minibatch(self.minibatch_size)
@@ -108,7 +110,15 @@ class ANN:
             self.training_error.append(error)
 
             # Validation
-            self.validation_testing(step=step)
+            if step % self.validation_interval == 0:
+                self.validation_testing(step=step)
+
+    def test(self):
+        print("\n~~~~~~~~~~~~~~~~~~~~~~~~~ Testing ~~~~~~~~~~~~~~~~~~~~~~~~")
+        train_accuracy, _ = self.compute_accuracy(self.caseman.training_cases)
+        test_accuracy, _ = self.compute_accuracy(self.caseman.testing_cases)
+        print('Train accuracy: {0:.3f} %'.format(train_accuracy))
+        print('Test accuracy: {0:.3f} %'.format(test_accuracy))
 
 
     # Add layer(GANNModule) in Layer.py's build()
@@ -122,4 +132,27 @@ class ANN:
 
         # Training
         self.train()
+
+        # Testing
+        self.test()
+
+        # Visualization
+        visual_options = {
+            'casemanager': self.caseman,
+            'session': self.session,
+            'input': self.input,
+            'map_layers': self.map_layers,
+            'map_dendrograms': self.map_dendrograms,
+            'display_weights': self.display_weights,
+            'display_biases': self.display_biases,
+            'map_batch_size': self.map_batch_size,
+            'layers': self.layers,
+            'training_step': self.training_step,
+            'training_error': self.training_error,
+            'validation_step': self.validation_step,
+            'validation_error': self.validation_error
+        }
+        visualizer = Visualizer(**visual_options)
+        visualizer.visualize()
+
 

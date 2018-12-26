@@ -1,6 +1,6 @@
 from src.ANN import ANN
 from src.Caseman import Caseman
-from src.presets import *
+from presets import *
 
 def runner(cfunc, dimensions, hidden_activation, output_activation, cost_func,
                  lrate, initial_weight_range, optimizer, case_fraction, val_frac, val_interval, test_frac, mb_size,
@@ -21,3 +21,4 @@ runner(**mnist)
 
 # Note
 # * Normalization range should depend on choice of activation function. https://discuss.pytorch.org/t/normalization-in-the-mnist-example/457/30
+# * Tensorboard

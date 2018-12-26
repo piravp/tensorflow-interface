@@ -396,8 +396,8 @@ def hinton_plot(matrix, maxval=None, maxsize=1, fig=None,trans=True,scale=True, 
         blob = PLT.Rectangle(bottom_left, size, size, facecolor=color, edgecolor=colors[3])
         axes.add_patch(blob)
     axes.autoscale_view()
-    PLT.draw()
-    PLT.pause(.001)
+    PLT.plot()
+    # PLT.pause(.001)
 
 # This graphically displays a matrix with color codes for positive, negative, small positive and small negative,
 # with the latter 2 defined by the 'cutoff' argument.  The transpose (trans) arg defaults to
@@ -428,8 +428,8 @@ def display_matrix(matrix,fig=None,trans=True,scale=True, title='Matrix',tform='
                   bbox=dict(facecolor=color,alpha=0.5,edgecolor='white'),ha='center',va='center',
                   color='black',size=tsize)
     axes.autoscale_view()
-    PLT.draw()
-    PLT.pause(1)
+    PLT.plot()
+    # PLT.pause(1)
 
 # ****** Principle Component Analysis (PCA) ********
 # This performs the basic operations outlined in "Python Machine Learning" (pp.128-135).  It begins with
@@ -460,17 +460,21 @@ def gen_dim_reduced_data(feature_array,target_size,eigen_values,eigen_vectors):
 # mode = single, average, complete, centroid, ward, median
 # metric = euclidean, cityblock (manhattan), hamming, cosine, correlation ... (see matplotlib distance.pdist for all 23)
 def dendrogram(features,labels,metric='euclidean',mode='average',ax=None,title='Dendrogram',orient='top',lrot=90.0):
+    PLT.figure()
     ax = ax if ax else PLT.gca()
     cluster_history = SCH.linkage(features,method=mode,metric=metric)
     SCH.dendrogram(cluster_history,labels=labels,orientation=orient,leaf_rotation=lrot)
     PLT.tight_layout()
     ax.set_title(title)
     ax.set_ylabel(metric + ' distance')
-    PLT.show()
+    # PLT.show()
+    PLT.plot()
 
-
-
-# Custom
+#------------------------------------------------------
+#
+################ Custom by piravp #####################
+#
+#------------------------------------------------------
 def show_image(image_arr):
     import matplotlib.pyplot as plt
     first_image = np.array(image_arr, dtype='float')
@@ -481,3 +485,9 @@ def show_image(image_arr):
 
 def one_hot_vectors_to_ints(one_hot_vectors):
     return [one_hot_to_int(one_hot_vector) for one_hot_vector in one_hot_vectors]
+
+def bit_to_int(bitlist):
+    out = 0
+    for bit in bitlist:
+        out = (out << 1) | bit
+    return out

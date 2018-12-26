@@ -34,7 +34,7 @@ def preprocess(dataset, type):
         data_x = data_x.reshape(samples_train, pixels*pixels)           # reshape to 60000, 28*28 as scaler expects 2d array
         data_x = scaler.fit_transform(data_x.astype(float))
 
-        dataset = []
+        processed_dataset = []
         # Gå fra to separate lister (input:0, target:1) til én liste med tuples
         for i in range(len(data_x)):
             # TODO: Done 24.12.2018, 00:34 --> convert ndarray to list
@@ -42,21 +42,24 @@ def preprocess(dataset, type):
 
             target_as_one_hot = TFT.int_to_one_hot(int=data_y[i], size=10)
             item = data_x[i], target_as_one_hot
-            dataset.append(item)
+            processed_dataset.append(item)
 
 
         # Normalized dataset
-        return dataset
+        return processed_dataset
 
     if type=='autoencoder':
-        processed_dataset = []
-        for input_target in dataset:
-            x, y = input_target
-            # np.asarray(input_target).T.tolist()   # reshape (2, 8) to (8, 2)
-            # x, y = np.asarray(x), np.asarray(y)
-            processed_dataset.append((x, y))
+        # processed_dataset = []
+        #
+        # # processed_dataset = np.empty((0, 2))
+        # for i, input_target in enumerate(processed_dataset):
+        #     x, y = input_target
+        #     # input_target = np.asarray(input_target).T.tolist()   # reshape (2, 8) to (8, 2)
+        #     # x, y = np.asarray(x), np.asarray(y)
+        #
+        #     processed_dataset.append((x, y))
 
-        return processed_dataset
+        return dataset # processed_dataset
 
 
 
@@ -92,13 +95,6 @@ def preprocess_wrapper(data, type):
         return extracted
 
 
-# temp = mnist
-# (train_x, train_y), (test_x, test_y) = mnist()
-# show_image(train_x[0])
 
-# m1, m2, m3 = mnist()
-# a1, a2, a3 = autoencoder()
-# print(m2, m3)
-# print(a2, a3)
 
 
