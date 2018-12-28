@@ -5,11 +5,20 @@ import numpy as np
 import copy
 import math
 import os  # For starting up tensorboard from inside python
+import matplotlib
 import matplotlib.pyplot as PLT
 import scipy.cluster.hierarchy as SCH  # Needed for dendrograms
 import numpy.random as NPR
 
-# ****** SESSION HANDLING *******
+window = PLT.get_current_fig_manager().window
+screen_y = window.winfo_screenheight()
+screen_x = window.winfo_screenwidth()
+temp = 0
+#--------------------------------------------------------------------------------------------------
+#
+#################################### Session Handling #########################################
+#
+#--------------------------------------------------------------------------------------------------
 
 def gen_initialized_session(dir='probeview'):
     sess = tf.Session()
@@ -38,7 +47,11 @@ def tfeval(operators):
     sess.close()
     return result
 
-# ***** TENSORBOARD SUPPORT ****
+#--------------------------------------------------------------------------------------------------
+#
+#################################### Tensorboard stuff #########################################
+#
+#--------------------------------------------------------------------------------------------------
 
 # This creates the main data for tensorboard viewing: the graph and variable histories.
 
@@ -57,7 +70,11 @@ def fireup_tensorboard(logdir, logwash=True):
 def clear_tensorflow_log(logdir):
     os.system('rm ' + logdir +'/events.out.*')
 
-# ***** GENERATING Simple DATA SETS for MACHINE LEARNING *****
+#--------------------------------------------------------------------------------------------------
+#
+############################# Generation of simple datasets for ML ##############################
+#
+#--------------------------------------------------------------------------------------------------
 
 # Generate all bit vectors of a given length (num_bits).
 def gen_all_bit_vectors(num_bits):
@@ -97,7 +114,6 @@ def str_to_bits(s): return [int(c) for c in s]
 
 # ****** VECTOR SHIFTING ******
 # Shift a vector right (dir=1) or left (dir= -1) and any number of spaces (delta).
-
 def shift_vector(v,dir=1,delta=1):
     dx = dir*delta; vl = len(v)
     v2 = v.copy()
@@ -338,7 +354,11 @@ def pp_matrix(m,style='{:.3f}'):
         for c in range(cols): print(style.format(m[r][c]), end=' ')
     print()
 
-# *******  DATA PLOTTING ROUTINES *********
+#--------------------------------------------------------------------------------------------------
+#
+################################## Data plotting routines #####################################
+#
+#--------------------------------------------------------------------------------------------------
 
 def simple_plot(yvals,xvals=None,xtitle='X',ytitle='Y',title='Y = F(X)'):
     xvals = xvals if xvals is not None else list(range(len(yvals)))
@@ -396,6 +416,7 @@ def hinton_plot(matrix, maxval=None, maxsize=1, fig=None,trans=True,scale=True, 
         blob = PLT.Rectangle(bottom_left, size, size, facecolor=color, edgecolor=colors[3])
         axes.add_patch(blob)
     axes.autoscale_view()
+    move_figure(hfig, 0, 0)
     PLT.plot()
     # PLT.pause(.001)
 
@@ -470,11 +491,11 @@ def dendrogram(features,labels,metric='euclidean',mode='average',ax=None,title='
     # PLT.show()
     PLT.plot()
 
-#------------------------------------------------------
+#--------------------------------------------------------------------------------------------------
 #
-################ Custom by piravp #####################
+#################################### Custom by piravp #########################################
 #
-#------------------------------------------------------
+#--------------------------------------------------------------------------------------------------
 def show_image(image_arr):
     import matplotlib.pyplot as plt
     first_image = np.array(image_arr, dtype='float')
@@ -491,3 +512,27 @@ def bit_to_int(bitlist):
     for bit in bitlist:
         out = (out << 1) | bit
     return out
+
+
+def plot_train_val_error(training_step, training_error, validation_step, validation_error):
+    # fig = PLT.figure()
+    PLT.plot(training_step, training_error, label="Training error")
+    PLT.plot(validation_step, validation_error, label="Validation error")
+    PLT.xlabel("Steps")
+    PLT.ylabel("Error")
+    PLT.legend()
+    # move_figure(fig, 0, 0)
+
+
+def move_figure(f, x, y):
+    """Move figure's upper left corner to pixel (x, y)"""
+    backend = matplotlib.get_backend()
+    if backend == 'TkAgg':
+        f.canvas.manager.window.wm_geometry("+%d+%d" % (x, y))
+    elif backend == 'WXAgg':
+        f.canvas.manager.window.SetPosition((x, y))
+    else:
+        # This works for QT and GTK
+        # You can also use window.setGeometry
+        f.canvas.manager.window.move(x, y)
+

@@ -77,11 +77,12 @@ class Visualizer():
         print('\n~~~~~~~~~~~~~~~~~~~~~~ Visualization ~~~~~~~~~~~~~~~~~~~~~')
         print('Drawing...')
         if only_error_plot:
-            self.plot_train_val_error()
+            TFT.plot_train_val_error(self.training_step, self.training_error, self.validation_step, self.validation_error)
+            print('Drawing completed!')
             plt.show()
             return
 
-        self.plot_train_val_error()
+        TFT.plot_train_val_error(self.training_step, self.training_error, self.validation_step, self.validation_error)
 
         if self.map_batch_size is not 0:
             grabvars = self.grab_vars()
@@ -96,10 +97,3 @@ class Visualizer():
         print('Drawing completed!')
         plt.show()
 
-    def plot_train_val_error(self):
-        plt.figure()
-        plt.plot(self.training_step, self.training_error, label="Training error")
-        plt.plot(self.validation_step, self.validation_error, label="Validation error")
-        plt.xlabel("Steps")
-        plt.ylabel("Error")
-        plt.legend()

@@ -20,5 +20,6 @@ runner(**mnist)
 
 
 # Note
+# * TensorFlow on GPU
 # * Normalization range should depend on choice of activation function. https://discuss.pytorch.org/t/normalization-in-the-mnist-example/457/30
 # * Tensorboard
